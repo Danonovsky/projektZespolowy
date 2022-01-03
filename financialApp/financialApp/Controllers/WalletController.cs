@@ -8,11 +8,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using financialApp.DAO;
 using financialApp.DAO.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace financialApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class WalletController : ControllerBase
     {
         private readonly MyDbContext _context;

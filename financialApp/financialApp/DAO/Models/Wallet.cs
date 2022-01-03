@@ -6,5 +6,6 @@
         public string Name { get; set; } = "Name";
         public Guid UserId { get; set; }
         public virtual User? User { get; set; }
+        public virtual List<Entry> Entries { get; set; } = new List<Entry>();
     }
 }
