@@ -1,7 +1,14 @@
+using financialApp.DAO;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddDbContext<MyDbContext>(_ =>
+{
+    _.UseSqlServer(builder.Configuration.GetConnectionString("mssql"));
+});
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
