@@ -1,10 +1,36 @@
 using financialApp.DAO;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddAuthentication(_ =>
+{
+    _.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    _.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(_ =>
+{
+    _.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+
+        ValidIssuer = "https://localhost:7278",
+        ValidAudience = "https://localhost:7278",
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(
+                builder.Configuration.GetSection("AppSettings").GetValue<string>("Secret")
+                )
+            )
+    };
+});
 builder.Services.AddDbContext<MyDbContext>(_ =>
 {
     _.UseSqlServer(builder.Configuration.GetConnectionString("mssql"));
@@ -25,6 +51,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
