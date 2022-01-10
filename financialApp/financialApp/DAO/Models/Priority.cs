@@ -1,9 +1,8 @@
-﻿namespace financialApp.DAO.Models
+﻿namespace financialApp.DAO.Models;
+
+public enum Priority
 {
-    public enum Priority
-    {
-        Low,
-        Medium,
-        High,
-    }
+    Low,
+    Medium,
+    High,
 }

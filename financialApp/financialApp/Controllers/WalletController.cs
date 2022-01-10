@@ -10,102 +10,101 @@ using financialApp.DAO;
 using financialApp.DAO.Models;
 using Microsoft.AspNetCore.Authorization;
 
-namespace financialApp.Controllers
+namespace financialApp.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+[Authorize]
+public class WalletController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    [Authorize]
-    public class WalletController : ControllerBase
+    private readonly MyDbContext _context;
+
+    public WalletController(MyDbContext context)
     {
-        private readonly MyDbContext _context;
+        _context = context;
+    }
 
-        public WalletController(MyDbContext context)
+    // GET: api/Wallet
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<Wallet>>> GetWallets()
+    {
+        return await _context.Wallets.ToListAsync();
+    }
+
+    // GET: api/Wallet/5
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Wallet>> GetWallet(Guid id)
+    {
+        var wallet = await _context.Wallets.FindAsync(id);
+
+        if (wallet == null)
         {
-            _context = context;
+            return NotFound();
         }
 
-        // GET: api/Wallet
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Wallet>>> GetWallets()
+        return wallet;
+    }
+
+    // PUT: api/Wallet/5
+    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutWallet(Guid id, Wallet wallet)
+    {
+        if (id != wallet.Id)
         {
-            return await _context.Wallets.ToListAsync();
+            return BadRequest();
         }
 
-        // GET: api/Wallet/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Wallet>> GetWallet(Guid id)
-        {
-            var wallet = await _context.Wallets.FindAsync(id);
+        _context.Entry(wallet).State = EntityState.Modified;
 
-            if (wallet == null)
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!WalletExists(id))
             {
                 return NotFound();
             }
-
-            return wallet;
-        }
-
-        // PUT: api/Wallet/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutWallet(Guid id, Wallet wallet)
-        {
-            if (id != wallet.Id)
+            else
             {
-                return BadRequest();
+                throw;
             }
-
-            _context.Entry(wallet).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!WalletExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
         }
 
-        // POST: api/Wallet
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Wallet>> PostWallet(Wallet wallet)
+        return NoContent();
+    }
+
+    // POST: api/Wallet
+    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+    [HttpPost]
+    public async Task<ActionResult<Wallet>> PostWallet(Wallet wallet)
+    {
+        _context.Wallets.Add(wallet);
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction("GetWallet", new { id = wallet.Id }, wallet);
+    }
+
+    // DELETE: api/Wallet/5
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteWallet(Guid id)
+    {
+        var wallet = await _context.Wallets.FindAsync(id);
+        if (wallet == null)
         {
-            _context.Wallets.Add(wallet);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetWallet", new { id = wallet.Id }, wallet);
+            return NotFound();
         }
 
-        // DELETE: api/Wallet/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteWallet(Guid id)
-        {
-            var wallet = await _context.Wallets.FindAsync(id);
-            if (wallet == null)
-            {
-                return NotFound();
-            }
+        _context.Wallets.Remove(wallet);
+        await _context.SaveChangesAsync();
 
-            _context.Wallets.Remove(wallet);
-            await _context.SaveChangesAsync();
+        return NoContent();
+    }
 
-            return NoContent();
-        }
-
-        private bool WalletExists(Guid id)
-        {
-            return _context.Wallets.Any(e => e.Id == id);
-        }
+    private bool WalletExists(Guid id)
+    {
+        return _context.Wallets.Any(e => e.Id == id);
     }
 }

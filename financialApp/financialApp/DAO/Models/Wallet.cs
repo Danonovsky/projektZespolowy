@@ -1,11 +1,10 @@
-﻿namespace financialApp.DAO.Models
+﻿namespace financialApp.DAO.Models;
+
+public class Wallet
 {
-    public class Wallet
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; } = "Name";
-        public Guid UserId { get; set; }
-        public virtual User? User { get; set; }
-        public virtual List<Entry> Entries { get; set; } = new List<Entry>();
-    }
+    public Guid Id { get; set; }
+    public string Name { get; set; } = "Name";
+    public Guid UserId { get; set; }
+    public virtual User? User { get; set; }
+    public virtual List<Entry> Entries { get; set; } = new List<Entry>();
 }

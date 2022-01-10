@@ -2,18 +2,17 @@
 
 #nullable disable
 
-namespace financialApp.Migrations
+namespace financialApp.Migrations;
+
+public partial class WalletFix : Migration
 {
-    public partial class WalletFix : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
 
-        }
+    }
 
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
 
-        }
     }
 }
