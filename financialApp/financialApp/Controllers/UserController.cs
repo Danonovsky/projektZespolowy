@@ -11,6 +11,7 @@ using financialApp.DAO.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace financialApp.Controllers;
 
@@ -35,11 +36,17 @@ public class UserController : ControllerBase
         var dbUser = await _context.Users.Where(_ => _.Login == user.Login && _.Password == user.Password).FirstOrDefaultAsync();
         if (dbUser != default(User))
         {
+            var claims = new List<Claim>
+            {
+                new Claim("Login",dbUser.Login),
+                new Claim("Id",dbUser.Id.ToString()),
+            };
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"));
             var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
             var tokeOptions = new JwtSecurityToken(
                 issuer: "http://localhost:5000",
                 audience: "http://localhost:5000",
+                claims: claims,
                 expires: DateTime.Now.AddDays(1),
                 signingCredentials: signinCredentials
             );

@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using financialApp.DAO;
 using financialApp.DAO.Models;
 using Microsoft.AspNetCore.Authorization;
+using financialApp.Helpers;
 
 namespace financialApp.Controllers;
 
@@ -18,17 +19,27 @@ namespace financialApp.Controllers;
 public class WalletController : ControllerBase
 {
     private readonly MyDbContext _context;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private Guid UserId { get; set; }
 
-    public WalletController(MyDbContext context)
+    public WalletController(
+        MyDbContext context,
+        IHttpContextAccessor httpContextAccessor)
     {
         _context = context;
+        _httpContextAccessor = httpContextAccessor;
+        UserId = _httpContextAccessor.GetUserId();
     }
 
     // GET: api/Wallet
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Wallet>>> GetWallets()
     {
-        return await _context.Wallets.ToListAsync();
+        return await _context.Wallets
+            .Where(_ => _.Id == UserId)
+            .Include(_ => _.Entries)
+            .ThenInclude(_ => _.Category)
+            .ToListAsync();
     }
 
     // GET: api/Wallet/5

@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using financialApp.DAO;
 using financialApp.DAO.Models;
 using Microsoft.AspNetCore.Authorization;
+using financialApp.Helpers;
 
 namespace financialApp.Controllers;
 
@@ -18,17 +19,24 @@ namespace financialApp.Controllers;
 public class EntryController : ControllerBase
 {
     private readonly MyDbContext _context;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private Guid UserId { get; set; }
 
-    public EntryController(MyDbContext context)
+    public EntryController(MyDbContext context,
+        IHttpContextAccessor httpContextAccessor)
     {
         _context = context;
+        _httpContextAccessor = httpContextAccessor;
+        UserId = _httpContextAccessor.GetUserId();
     }
 
     // GET: api/Entry
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Entry>>> GetEntries()
     {
-        return await _context.Entries.ToListAsync();
+        return await _context.Entries
+            .Where(_ => _.Id == UserId)
+            .ToListAsync();
     }
 
     // GET: api/Entry/5
