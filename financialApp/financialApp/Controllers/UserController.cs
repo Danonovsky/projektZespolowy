@@ -38,8 +38,8 @@ public class UserController : ControllerBase
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"));
             var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
             var tokeOptions = new JwtSecurityToken(
-                issuer: "https://localhost:7278",
-                audience: "https://localhost:7278",
+                issuer: "http://localhost:5000",
+                audience: "http://localhost:5000",
                 expires: DateTime.Now.AddDays(1),
                 signingCredentials: signinCredentials
             );

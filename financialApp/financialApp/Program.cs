@@ -22,8 +22,8 @@ builder.Services.AddAuthentication(_ =>
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
 
-        ValidIssuer = "https://localhost:7278",
-        ValidAudience = "https://localhost:7278",
+        ValidIssuer = "http://localhost:5000",
+        ValidAudience = "http://localhost:5000",
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(
                 builder.Configuration.GetSection("AppSettings").GetValue<string>("Secret")
@@ -49,7 +49,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -35,7 +35,9 @@ public class WalletController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<Wallet>> GetWallet(Guid id)
     {
-        var wallet = await _context.Wallets.FindAsync(id);
+        var wallet = await _context.Wallets.
+            Include(_ => _.Entries)
+            .FirstAsync(_ => _.Id == id);
 
         if (wallet == null)
         {
