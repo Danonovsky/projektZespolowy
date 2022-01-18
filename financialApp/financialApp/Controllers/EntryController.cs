@@ -13,6 +13,17 @@ using financialApp.Helpers;
 
 namespace financialApp.Controllers;
 
+public class EntryIn
+{
+    public DateTime Date { get; set; } = DateTime.Now;
+    public decimal Amount { get; set; } = 0;
+    public string Description { get; set; } = "";
+    public Guid CategoryId { get; set; }
+    public Guid WalletId { get; set; }
+    public string EntryType { get; set; }
+    public string Priority { get; set; }
+}
+
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
@@ -87,8 +98,27 @@ public class EntryController : ControllerBase
     // POST: api/Entry
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
-    public async Task<ActionResult<Entry>> PostEntry(Entry entry)
+    public async Task<ActionResult<Entry>> PostEntry(EntryIn request)
     {
+        Entry entry = new Entry
+        {
+            Amount = request.Amount,
+            CategoryId = request.CategoryId,
+            WalletId = request.WalletId,
+            Date = request.Date,
+            Description = request.Description
+        };
+        entry.EntryType = request.EntryType switch
+        {
+            "income" => EntryType.Income,
+            _ => EntryType.Expense,
+        };
+        entry.Priority = request.Priority switch
+        {
+            "low" => Priority.Low,
+            "high" => Priority.High,
+            _ => Priority.Medium,
+        };
         _context.Entries.Add(entry);
         await _context.SaveChangesAsync();
 

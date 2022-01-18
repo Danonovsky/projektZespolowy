@@ -9,3 +9,9 @@ public class Category
     public virtual List<Category> Categories { get; set; } = new List<Category>();
     public virtual List<Wallet> Wallets { get; set; } = new List<Wallet>();
 }
+
+public class CategoryOut
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = "";
+}

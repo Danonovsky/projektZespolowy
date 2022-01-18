@@ -4,7 +4,7 @@ public static class Extensions
 {
     public static Guid GetUserId(this IHttpContextAccessor httpContextAccessor)
     {
-        var id = new Guid(httpContextAccessor.HttpContext.User.Claims.First(_ => _.Type == "id").Value);
+        var id = new Guid(httpContextAccessor.HttpContext.User.Claims.First(_ => _.Type == "Id").Value);
         return id;
     }
 }

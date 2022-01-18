@@ -33,13 +33,36 @@ public class WalletController : ControllerBase
 
     // GET: api/Wallet
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Wallet>>> GetWallets()
+    public async Task<ActionResult<IEnumerable<WalletOut>>> GetWallets()
     {
-        return await _context.Wallets
-            .Where(_ => _.Id == UserId)
+        var result =  await _context.Wallets
+            .Where(_ => _.UserId == UserId)
             .Include(_ => _.Entries)
             .ThenInclude(_ => _.Category)
+            .Select(_ => new WalletOut
+            {
+                Entries = _.Entries.Select(_ => new EntryOut
+                {
+                    Id = _.Id,
+                    Amount = _.Amount,
+                    CategoryId = _.CategoryId,
+                    Date = _.Date,
+                    Description = _.Description,
+                    EntryType = _.EntryType.ToString(),
+                    Priority = _.Priority.ToString(),
+                    Category = new CategoryOut
+                    {
+                        Id = _.Category.Id,
+                        Name = _.Category.Name
+                    },
+                    WalletId = _.WalletId
+                }).ToList(),
+                Id = _.Id,
+                Name = _.Name,
+                UserId = _.UserId
+            })
             .ToListAsync();
+        return result;
     }
 
     // GET: api/Wallet/5
@@ -94,6 +117,7 @@ public class WalletController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Wallet>> PostWallet(Wallet wallet)
     {
+        wallet.UserId = UserId;
         _context.Wallets.Add(wallet);
         await _context.SaveChangesAsync();
 

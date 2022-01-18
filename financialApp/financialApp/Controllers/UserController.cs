@@ -20,9 +20,13 @@ namespace financialApp.Controllers;
 public class UserController : ControllerBase
 {
     private readonly MyDbContext _context;
+    private readonly IConfiguration _configuration;
 
-    public UserController(MyDbContext context)
+    public UserController(
+        IConfiguration configuration,
+        MyDbContext context)
     {
+        _configuration = configuration;
         _context = context;
     }
 
@@ -41,7 +45,12 @@ public class UserController : ControllerBase
                 new Claim("Login",dbUser.Login),
                 new Claim("Id",dbUser.Id.ToString()),
             };
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"));
+            var secretKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(
+                    _configuration.GetSection("AppSettings")
+                    .GetValue<string>("Secret")
+                )
+                );
             var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
             var tokeOptions = new JwtSecurityToken(
                 issuer: "http://localhost:5000",
