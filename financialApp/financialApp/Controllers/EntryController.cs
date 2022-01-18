@@ -1,9 +1,4 @@
 ﻿#nullable disable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using financialApp.DAO;
@@ -47,6 +42,31 @@ public class EntryController : ControllerBase
     {
         return await _context.Entries
             .Where(_ => _.Id == UserId)
+            .ToListAsync();
+    }
+    
+    [HttpGet("Wallet/{walletId}")]
+    public async Task<ActionResult<IEnumerable<EntryOut>>> GetEntriesFromWallet(Guid WalletId)
+    {
+        return await _context.Entries
+            .Where(_ => _.WalletId == WalletId)
+            .Select(_ => new EntryOut
+            {
+                Amount = _.Amount,
+                Category = new CategoryOut
+                {
+                    Id = _.Category.Id,
+                    Name = _.Category.Name,
+                },
+                CategoryId = _.CategoryId,
+                Date = _.Date,
+                Description = _.Description,
+                EntryType = _.EntryType.ToString(),
+                Id = _.Id,
+                Priority = _.Priority.ToString(),
+                WalletId = _.WalletId
+            })
+            .OrderByDescending(_ => _.Date)
             .ToListAsync();
     }
 
